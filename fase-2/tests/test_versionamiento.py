@@ -1,39 +1,41 @@
+"""Prueba 5 - Versionamiento: segunda versión conserva la primera; id repetido no sobrescribe."""
+import hashlib
+
 import pytest
-from pathlib import Path
-from src.versioning import (
-    ensure_version_available,
-    validate_version_id,
-    VersionExistsError,
-    InvalidVersionError,
-    METADATA_FILENAME,
-    METRICS_FILENAME,
-    MODEL_FILENAME
-)
 
-def test_validacion_id_version():
-    """Verifica que la validación del identificador de versión funcione correctamente."""
-    validate_version_id("v1")
-    validate_version_id("v2_test")
-
-    with pytest.raises(InvalidVersionError):
-        validate_version_id("")
+from src.errors import InvalidVersionError, VersionExistsError
+from src.training import run_training
+from src.versioning import load_bundle
 
 
-def test_no_sobrescribir_version_existente(tmp_path):
-    """Verifica que intentar usar una versión existente genere VersionExistsError."""
-    models_dir = tmp_path / "models"
-    v1_dir = models_dir / "v1"
-    v1_dir.mkdir(parents=True)
+def _digest(path):
+    return hashlib.sha256(path.read_bytes()).hexdigest()
 
-    # ensure_version_available recibe primero output_dir y luego version
+
+def test_segunda_version_conserva_la_primera_y_ambas_cargan(tmp_path, data_csv):
+    out = tmp_path / "models"
+    run_training(data_csv, "Churn", out, "v1", seed=42)
+    h1 = _digest(out / "v1" / "modelo.joblib")
+    run_training(data_csv, "Churn", out, "v2", seed=7, optimize_threshold=True, cv_folds=3)
+    assert sorted(p.name for p in out.iterdir()) == ["v1", "v2"]
+    assert _digest(out / "v1" / "modelo.joblib") == h1
+    b1, b2 = load_bundle(out / "v1"), load_bundle(out / "v2")
+    assert b1["version"] == "v1" and b2["version"] == "v2"
+    assert b1["threshold"] == 0.5
+    assert 0.05 <= b2["threshold"] <= 0.95
+
+
+def test_identificador_repetido_no_sobrescribe(tmp_path, data_csv):
+    out = tmp_path / "models"
+    run_training(data_csv, "Churn", out, "v1", seed=42)
+    before = {p.name: _digest(p) for p in (out / "v1").iterdir()}
     with pytest.raises(VersionExistsError):
-        ensure_version_available(str(models_dir), "v1")
+        run_training(data_csv, "Churn", out, "v1", seed=1)
+    after = {p.name: _digest(p) for p in (out / "v1").iterdir()}
+    assert before == after
 
 
-def test_version_disponible_ok(tmp_path):
-    """Verifica que para un identificador nuevo no se genere error de versión."""
-    models_dir = tmp_path / "models"
-    models_dir.mkdir(parents=True)
-
-    # ensure_version_available recibe primero output_dir y luego version
-    ensure_version_available(str(models_dir), "v_nueva")
+@pytest.mark.parametrize("bad", ["", "../fuera", "v 1", "a/b"])
+def test_identificador_invalido(tmp_path, data_csv, bad):
+    with pytest.raises(InvalidVersionError):
+        run_training(data_csv, "Churn", tmp_path / "m", bad)
