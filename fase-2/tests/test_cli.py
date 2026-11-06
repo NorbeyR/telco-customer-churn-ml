@@ -1,65 +1,48 @@
-import sys
+"""Línea de comandos: --help, ejecución completa y códigos de salida distintos de cero ante errores."""
 import subprocess
+import sys
+from pathlib import Path
+
 import pandas as pd
-import pytest
 
-def test_cli_train_ejecucion_exitosa(tmp_path):
-    """Prueba la ejecución de train.py desde la línea de comandos."""
-    cmd = [
-        sys.executable, "train.py",
-        "--data", "data/WA_Fn-UseC_-Telco-Customer-Churn.csv",
-        "--target", "Churn",
-        "--output-dir", str(tmp_path),
-        "--version", "v_cli_test",
-        "--seed", "42"
-    ]
-    
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    assert result.returncode == 0, f"Error en train CLI: {result.stderr}"
-    assert (tmp_path / "v_cli_test" / "modelo.joblib").exists() or (tmp_path / "v_cli_test" / "model.joblib").exists()
+ROOT = Path(__file__).resolve().parent.parent
 
-def test_cli_predict_ejecucion_exitosa(tmp_path):
-    """Prueba la ejecución de predict.py desde la línea de comandos generando el CSV de salida."""
-    # 1. Entrenar modelo
-    train_cmd = [
-        sys.executable, "train.py",
-        "--data", "data/WA_Fn-UseC_-Telco-Customer-Churn.csv",
-        "--target", "Churn",
-        "--output-dir", str(tmp_path),
-        "--version", "v_predict_cli",
-        "--seed", "42"
-    ]
-    subprocess.run(train_cmd, check=True)
-    
-    # Buscar el modelo generado (.joblib)
-    v_dir = tmp_path / "v_predict_cli"
-    model_file = list(v_dir.glob("*.joblib"))[0]
-    
-    output_csv = tmp_path / "predicciones.csv"
-    predict_cmd = [
-        sys.executable, "predict.py",
-        "--model", str(model_file),
-        "--input", "data/ejemplo_prediccion.csv",
-        "--output", str(output_csv)
-    ]
-    
-    result = subprocess.run(predict_cmd, capture_output=True, text=True)
-    assert result.returncode == 0, f"Error en predict CLI: {result.stderr}"
-    assert output_csv.exists()
-    
-    # Verificar cantidad de filas conservadas
-    df_in = pd.read_csv("data/ejemplo_prediccion.csv")
-    df_out = pd.read_csv(output_csv)
-    assert len(df_in) == len(df_out)
 
-def test_cli_entrada_invalida_codigo_salida_no_cero():
-    """Verifica que una entrada inválida devuelva un código de salida distinto de 0."""
-    predict_cmd = [
-        sys.executable, "predict.py",
-        "--model", "models/v_inexistente/modelo.joblib",
-        "--input", "data/ejemplo_invalido.csv",
-        "--output", "outputs/salida_fallida.csv"
-    ]
-    
-    result = subprocess.run(predict_cmd, capture_output=True, text=True)
-    assert result.returncode != 0
+def run(*args):
+    return subprocess.run([sys.executable, *args], cwd=ROOT, text=True, capture_output=True)
+
+
+def test_help_de_ambos_scripts():
+    for script in ("train.py", "predict.py"):
+        r = run(script, "--help")
+        assert r.returncode == 0 and "--" in r.stdout
+
+
+def test_entrenar_y_predecir_por_linea_de_comandos(tmp_path, data_csv, new_csv):
+    r = run("train.py", "--data", str(data_csv), "--target", "Churn",
+            "--output-dir", str(tmp_path / "models"), "--version", "v1", "--seed", "42")
+    assert r.returncode == 0, r.stderr
+    out_csv = tmp_path / "out" / "pred.csv"
+    r = run("predict.py", "--model", str(tmp_path / "models" / "v1" / "modelo.joblib"),
+            "--input", str(new_csv), "--output", str(out_csv))
+    assert r.returncode == 0, r.stderr
+    res = pd.read_csv(out_csv)
+    assert len(res) == 12 and "prediccion" in res.columns
+
+
+def test_columna_ausente_termina_con_codigo_distinto_de_cero_y_sin_archivo(tmp_path, trained, new_csv):
+    out, _ = trained
+    bad = tmp_path / "bad.csv"
+    pd.read_csv(new_csv).drop(columns=["tenure"]).to_csv(bad, index=False)
+    out_csv = tmp_path / "pred.csv"
+    r = run("predict.py", "--model", str(out / "v1"), "--input", str(bad), "--output", str(out_csv))
+    assert r.returncode != 0
+    assert "tenure" in r.stderr
+    assert not out_csv.exists()
+
+
+def test_version_repetida_por_cli_falla(tmp_path, data_csv):
+    args = ("train.py", "--data", str(data_csv), "--output-dir", str(tmp_path / "m"), "--version", "v1")
+    assert run(*args).returncode == 0
+    r = run(*args)
+    assert r.returncode != 0 and "ya existe" in r.stderr
