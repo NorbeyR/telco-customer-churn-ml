@@ -1,0 +1,10 @@
+customerID,prediccion,prediccion_etiqueta,probabilidad_churn
+7590-VHVEG,1,Churn,0.804827
+5575-GNVDE,0,No Churn,0.118086
+3668-QPYBK,1,Churn,0.532107
+7795-CFOCW,0,No Churn,0.080991
+4472-LVYGI,0,No Churn,0.24674
+3115-CZMZD,0,No Churn,0.112604
+5709-LVOEQ,0,No Churn,0.190916
+6380-ARCEH,1,Churn,0.390258
+7020-OZKXZ,1,Churn,0.71475
