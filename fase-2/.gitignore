@@ -1,0 +1,21 @@
+# Entornos y cachés
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+.vscode/
+.idea/
+.env
+kaggle.json
+
+# Artefactos temporales (las versiones v1 y v2 SÍ se versionan en Git)
+models/.*tmp*/
+models/v-docker/
+models/v-test*/
+outputs/*
+!outputs/predicciones_v1.csv
+!outputs/predicciones_v2.csv
+!outputs/.gitkeep
