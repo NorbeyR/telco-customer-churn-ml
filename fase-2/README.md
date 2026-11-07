@@ -2,12 +2,12 @@
 **Modelos y Simulación de Sistemas I - Universidad de Antioquia - 2026 II**
 
 **Integrantes:** Heidy Dayana Gamboa Chaverra, Santiago Restrepo Rodriguez, Norbey David Rincón Bedoya.
-**Commit / etiqueta de la Entrega 2:** `entrega-2` (commit: `532d522`).
+**Etiqueta de la Entrega 2:** `entrega-2`
 
 ## 1. Problema y relación con la Fase 1
 Clasificación binaria: predecir si un cliente de telecomunicaciones abandonará (`Churn = Yes`) con datos de su cuenta. Se conservan el problema, el dataset (IBM Telco Customer Churn), la partición 80/20 estratificada con semilla 42 y el modelo (Regresión Logística balanceada + Dummy como base) de [`../fase-1`](../fase-1/README.md). La Fase 2 convierte el notebook en una aplicación con `train.py`, `predict.py`, versiones de modelo, Docker y pruebas.
 
-**Aclaración sobre los datos:** IBM publica este conjunto como una muestra de una empresa **ficticia**. Es útil con fines didácticos, pero no acredita registros reales ni permite extrapolar los resultados a operadores colombianos.
+**Aclaración sobre los datos:** IBM publica este conjunto como una muestra de una empresa **ficticia**. Es útil con fines didácticos, pero no acredita registros reales ni permite extrapolarlos a operadores colombianos.
 
 **Horizonte y momento de captura:** `Churn` indica si el cliente abandonó en el último mes; se asume un horizonte de un mes. Las variables son una captura de la cuenta; que sean datos de cuenta no demuestra que estén disponibles *antes* del evento (p. ej. `tenure`/`TotalCharges` se miden en el corte). Es una limitación conocida.
 
@@ -24,7 +24,7 @@ Clasificación binaria: predecir si un cliente de telecomunicaciones abandonará
 | Datos ficticios y horizonte de abandono. | Aclarado arriba y en el notebook. |
 
 ## 3. Entorno
-Python **3.13** (probado con 3.13; el Docker usa `python:3.13-slim`).
+Python **3.12 o 3.13** (el equipo probó con 3.12.10 y 3.13; el Docker usa `python:3.13-slim`).
 ```bash
 cd fase-2
 python -m venv .venv
@@ -98,22 +98,27 @@ docker run --rm -v "$PWD/data:/app/data:ro" -v "$PWD/models:/app/models:ro" -v "
 ```
 El entrenamiento no ocurre en `docker build`; modelos y predicciones persisten en `models/` y `outputs/` del equipo anfitrión. `v-docker` y `outputs/docker_*` están en `.gitignore`.
 
-**Evidencia de ejecución:** Git Bash + Docker Engine en WSL 2:
+**Evidencia de ejecución real (Git Bash + Docker Engine en WSL 2):**
 
 1. **Construcción de la imagen Docker (`modelos-fase2:1.0`):**
 ```text
-$ docker build -t modelos-fase2:1.0 .
-[+] Building 144.5s (15/15) FINISHED
- => [internal] load build definition from Dockerfile
- => [internal] load metadata for docker.io/library/python:3.13-slim
- => [ 1/10] FROM docker.io/library/python:3.13-slim
- => [ 4/10] RUN pip install --no-cache-dir -r requirements.txt
- => exporting to image
+$ docker build -t modelos-fase2:1.0 --build-arg GIT_COMMIT=$(git rev-parse HEAD) .
+[+] Building 144.5s (15/15) FINISHED                                                      docker:desktop-linux
+ => [internal] load build definition from Dockerfile                                                      2.4s
+ => [internal] load metadata for docker.io/library/python:3.13-slim                                      5.5s
+ => [ 1/10] FROM docker.io/library/python:3.13-slim                                                     17.2s
+ => [ 4/10] RUN pip install --no-cache-dir -r requirements.txt                                           84.4s
+ => exporting to image                                                                                   31.6s
+ => => naming to docker.io/library/modelos-fase2:1.0                                                     0.0s
 ```
 
-2. **Entrenamiento en contenedor (`models/v-docker`):**
+2. **Entrenamiento en contenedor con volumen persistente (`models/v-docker`):**
 ```bash
-$ MSYS_NO_PATHCONV=1 docker run --rm -v "$PWD/data:/app/data:ro" -v "$PWD/models:/app/models" modelos-fase2:1.0 python train.py --data data/WA_Fn-UseC_-Telco-Customer-Churn.csv --version v-docker
+$ MSYS_NO_PATHCONV=1 docker run --rm \
+  -v "$PWD/data:/app/data:ro" \
+  -v "$PWD/models:/app/models" \
+  modelos-fase2:1.0 python train.py \
+  --data data/WA_Fn-UseC_-Telco-Customer-Churn.csv --target Churn --output-dir models --version v-docker --seed 42
 ```
 **Salida obtenida:**
 ```text
@@ -122,22 +127,49 @@ Versión 'v-docker' entrenada con 5634 clientes y evaluada con 1409 (umbral = 0.
 Baseline            0.7346    0.0000    0.0000    0.5000    1870.0
 Modelo              0.7381    0.7834    0.6136    0.8415     693.0
 Abandonos detectados: 293 de 374 | no detectados: 81 | falsas alarmas: 288
+Archivos generados:
+  models/v-docker/modelo.joblib
+  models/v-docker/metrics.json
+  models/v-docker/metadata.json
 ```
 
-3. **Predicción en contenedor (`outputs/docker_predicciones.csv`):**
+3. **Predicción en contenedor con volumen persistente (`outputs/docker_predicciones.csv`):**
 ```bash
-$ MSYS_NO_PATHCONV=1 docker run --rm -v "$PWD/data:/app/data:ro" -v "$PWD/models:/app/models:ro" -v "$PWD/outputs:/app/outputs" modelos-fase2:1.0 python predict.py --model models/v-docker --input data/ejemplo_prediccion.csv --output outputs/docker_predicciones.csv
+$ MSYS_NO_PATHCONV=1 docker run --rm \
+  -v "$PWD/data:/app/data:ro" \
+  -v "$PWD/models:/app/models:ro" \
+  -v "$PWD/outputs:/app/outputs" \
+  modelos-fase2:1.0 python predict.py \
+  --model models/v-docker/modelo.joblib --input data/ejemplo_prediccion.csv --output outputs/docker_predicciones.csv
 ```
 **Salida obtenida:**
 ```text
 AVISO: 3 valores de TotalCharges vacíos imputados con 0 (regla de la versión guardada).
 Versión 'v-docker': 9 predicciones (3 con riesgo de abandono, umbral 0.5).
+Resultados en: outputs/docker_predicciones.csv
+```
+
+4. **Evidencia de persistencia en el sistema de archivos del anfitrión:**
+```bash
+$ ls models/v-docker outputs
+models/v-docker:
+metadata.json  metrics.json  modelo.joblib
+
+outputs:
+docker_predicciones.csv  predicciones_v1.csv  predicciones_v2.csv
+
+$ head -3 outputs/docker_predicciones.csv
+customerID,prediccion,prediccion_etiqueta,probabilidad_churn
+7590-VHVEG,1,Churn,0.804827
+5575-GNVDE,0,No Churn,0.185203
 ```
 
 ## 10. Pruebas
 ```bash
 python -m pytest
 ```
+Resultado esperado: **`26 passed`**.
+
 | Archivo | Verifica |
 | :--- | :--- |
 | `test_entrenamiento.py` | genera artefacto, métricas y metadatos; partición sin fuga; umbral solo con train; error si falta el objetivo |
