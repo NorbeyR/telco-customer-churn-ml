@@ -1,0 +1,66 @@
+{
+  "metrica_principal": "f1_churn (con recall y roc_auc); evaluación sobre el conjunto de prueba",
+  "etiquetas": {
+    "1": "Yes = abandona (Churn)",
+    "0": "No = permanece"
+  },
+  "costos_supuestos": {
+    "costo_abandono_no_detectado": 5.0,
+    "costo_falsa_alarma": 1.0,
+    "unidad": "unidades relativas (supuesto del equipo, no cifras reales)"
+  },
+  "umbral_seleccion": {
+    "metodo": "cv_costo_minimo",
+    "cv_folds": 5,
+    "costo_cv_umbral_0.5": 2605.0,
+    "costo_cv_umbral_elegido": 2385.0
+  },
+  "modelo": {
+    "umbral": 0.37,
+    "accuracy": 0.6849,
+    "precision_churn": 0.4528,
+    "recall_churn": 0.8984,
+    "f1_churn": 0.6022,
+    "roc_auc": 0.8415,
+    "matriz_confusion": {
+      "tn": 629,
+      "fp": 406,
+      "fn": 38,
+      "tp": 336
+    },
+    "costo_total": 596.0,
+    "costo_por_cliente": 0.423
+  },
+  "baseline": {
+    "umbral": 0.5,
+    "accuracy": 0.7346,
+    "precision_churn": 0.0,
+    "recall_churn": 0.0,
+    "f1_churn": 0.0,
+    "roc_auc": 0.5,
+    "matriz_confusion": {
+      "tn": 1035,
+      "fp": 0,
+      "fn": 374,
+      "tp": 0
+    },
+    "costo_total": 1870.0,
+    "costo_por_cliente": 1.3272
+  },
+  "modelo_con_umbral_0.5": {
+    "umbral": 0.5,
+    "accuracy": 0.7381,
+    "precision_churn": 0.5043,
+    "recall_churn": 0.7834,
+    "f1_churn": 0.6136,
+    "roc_auc": 0.8415,
+    "matriz_confusion": {
+      "tn": 747,
+      "fp": 288,
+      "fn": 81,
+      "tp": 293
+    },
+    "costo_total": 693.0,
+    "costo_por_cliente": 0.4918
+  }
+}
