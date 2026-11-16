@@ -9,6 +9,7 @@ Este repositorio contiene el proyecto integrador por fases. Cada fase tiene su p
 | :--- | :--- | :--- |
 | [`fase-1/`](fase-1/README.md) | Notebook de EDA, preparación, modelo base y Regresión Logística. | `cd fase-1` y abrir `notebook.ipynb` |
 | [`fase-2/`](fase-2/README.md) | Aplicación reproducible: `train.py`, `predict.py`, versionamiento, Docker y pytest. | `cd fase-2` y seguir su README |
+| [`fase-3/`](fase-3/README.md) | API REST (FastAPI): `/health`, `/predict`, `/train`, Docker, cliente de prueba y pytest. | `cd fase-3` y seguir su README |
 
 Los archivos **no están en la raíz**: entre a la carpeta de la fase antes de ejecutar nada.
 
