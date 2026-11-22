@@ -19,3 +19,6 @@ outputs/*
 !outputs/predicciones_v1.csv
 !outputs/predicciones_v2.csv
 !outputs/.gitkeep
+
+# Carpeta temporal de verificar_recorrido.sh
+.verificacion/
