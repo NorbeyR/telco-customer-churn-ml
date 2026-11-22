@@ -236,7 +236,185 @@ Recorrido completado. Evidencia en: /c/Users/USUARIO/Desktop/telco-customer-chur
 ```
 (En el paso 5, "versin" sin tilde es solo la codificación de la consola de Windows; el código del programa escribe "versión".)
 
-**Salida obtenida con `--docker`:** `<<COMPLETAR: salida de --docker (Norbey); "commit en metadata.json" debe coincidir con "commit actual (HEAD)">>`
+**Salida obtenida con `--docker`:**
+```text
+== 1. Entrenar 'v-verificacion' en un directorio limpio
+Versi�n 'v-verificacion' entrenada con 5634 clientes y evaluada con 1409 (umbral = 0.5).
+                  accuracy    recall        f1   roc_auc     costo
+Baseline            0.7346    0.0000    0.0000    0.5000    1870.0
+Modelo              0.7381    0.7834    0.6136    0.8415     693.0
+Abandonos detectados: 293 de 374 | no detectados: 81 | falsas alarmas: 288
+Archivos generados:
+  C:\Users\norbe\telco-customer-churn-ml\fase-2\.verificacion\models\v-verificacion\modelo.joblib
+  C:\Users\norbe\telco-customer-churn-ml\fase-2\.verificacion\models\v-verificacion\metrics.json
+  C:\Users\norbe\telco-customer-churn-ml\fase-2\.verificacion\models\v-verificacion\metadata.json
+
+== 2. Archivos de la versión
+total 20
+-rw-r--r-- 1 norbe 197609 2120 Nov 22 18:20 metadata.json
+-rw-r--r-- 1 norbe 197609 1098 Nov 22 18:20 metrics.json
+-rw-r--r-- 1 norbe 197609 8683 Nov 22 18:20 modelo.joblib
+
+== 3. Cargar el artefacto y predecir sobre un CSV pequeño
+AVISO: 3 valores de TotalCharges vac�os imputados con 0 (regla de la versi�n guardada).
+Versi�n 'v-verificacion': 9 predicciones (3 con riesgo de abandono, umbral 0.5).
+Resultados en: C:/Users/norbe/telco-customer-churn-ml/fase-2/.verificacion/outputs/predicciones.csv
+customerID,prediccion,prediccion_etiqueta,probabilidad_churn
+7590-VHVEG,1,Churn,0.804827
+5575-GNVDE,0,No Churn,0.118086
+3668-QPYBK,1,Churn,0.532107
+
+== 4. Metadatos: commit y entorno
+commit en metadata.json : 6ab0002cc91fbac38117730a729e88fcadcde428
+commit actual (HEAD)    : 6ab0002cc91fbac38117730a729e88fcadcde428
+python / scikit-learn   : 3.13.15 / 1.9.1
+semilla / datos sha256  : 42 / 88be4b93fbe0
+
+== 5. Repetir el identificador no reemplaza la versión
+Rechazado con código de salida 1 -> ERROR: La versi�n 'v-verificacion' ya existe en 'C:/Users/norbe/telco-customer-churn-ml/fase-2/.verificacion/models'. No se sobrescribe: use otro identificador (p. ej. la siguiente versi�n).
+modelo.joblib intacto (sha256 d835ae67856c)
+
+== 6. Docker: el commit llega a los metadatos
+#0 building with "desktop-linux" instance using docker driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 1.21kB 0.1s done
+#1 DONE 0.1s
+
+#2 [internal] load metadata for docker.io/library/python:3.13-slim
+#2 ...
+
+#3 [auth] library/python:pull token for registry-1.docker.io
+#3 DONE 0.0s
+
+#2 [internal] load metadata for docker.io/library/python:3.13-slim
+#2 DONE 1.5s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 221B 0.0s done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 DONE 0.0s
+
+#6 [ 1/10] FROM docker.io/library/python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90
+#6 resolve docker.io/library/python:3.13-slim@sha256:e48f59cdba69a3cbd9ed2cf0f348d90d45a8d350d98134cf1070bc106ee9ed90 0.0s done
+#6 DONE 0.1s
+
+#5 [internal] load build context
+#5 transferring context: 20.18kB 0.0s done
+#5 DONE 0.1s
+
+#7 [ 2/10] WORKDIR /app
+#7 CACHED
+
+#8 [ 3/10] COPY requirements.txt .
+#8 DONE 0.1s
+
+#9 [ 4/10] RUN pip install --no-cache-dir -r requirements.txt
+#9 4.926 Collecting numpy==2.5.4 (from -r requirements.txt (line 1))
+#9 5.592   Downloading numpy-2.5.4-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (6.6 kB)
+#9 6.037 Collecting pandas==3.0.2 (from -r requirements.txt (line 2))
+#9 6.158   Downloading pandas-3.0.2-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl.metadata (79 kB)
+#9 6.896 Collecting scipy==1.18.1 (from -r requirements.txt (line 3))
+#9 7.017   Downloading scipy-1.18.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (62 kB)
+#9 7.684 Collecting scikit-learn==1.9.1 (from -r requirements.txt (line 4))
+#9 7.808   Downloading scikit_learn-1.9.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl.metadata (9.3 kB)
+#9 7.988 Collecting joblib==1.6.0 (from -r requirements.txt (line 5))
+#9 8.101   Downloading joblib-1.6.0-py3-none-any.whl.metadata (6.5 kB)
+#9 8.259 Collecting threadpoolctl==3.7.0 (from -r requirements.txt (line 6))
+#9 8.380   Downloading threadpoolctl-3.7.0-py3-none-any.whl.metadata (24 kB)
+#9 8.578 Collecting pytest==9.1.1 (from -r requirements.txt (line 7))
+#9 8.697   Downloading pytest-9.1.1-py3-none-any.whl.metadata (7.6 kB)
+#9 8.862 Collecting python-dateutil>=2.8.2 (from pandas==3.0.2->-r requirements.txt (line 2))
+#9 8.982   Downloading python_dateutil-4.0.0-py3-none-any.whl.metadata (7.3 kB)
+#9 9.200 Collecting narwhals>=2.0.1 (from scikit-learn==1.9.1->-r requirements.txt (line 4))
+#9 9.315   Downloading narwhals-2.29.0-py3-none-any.whl.metadata (15 kB)
+#9 9.474 Collecting cloudpickle>=3.0 (from joblib==1.6.0->-r requirements.txt (line 5))
+#9 9.609   Downloading cloudpickle-3.1.3-py3-none-any.whl.metadata (7.1 kB)
+#9 9.781 Collecting iniconfig>=1.0.1 (from pytest==9.1.1->-r requirements.txt (line 7))
+#9 9.908   Downloading iniconfig-2.3.1-py3-none-any.whl.metadata (2.8 kB)
+#9 10.07 Collecting packaging>=22 (from pytest==9.1.1->-r requirements.txt (line 7))
+#9 10.19   Downloading packaging-26.3-py3-none-any.whl.metadata (3.5 kB)
+#9 10.34 Collecting pluggy<2,>=1.5 (from pytest==9.1.1->-r requirements.txt (line 7))
+#9 10.46   Downloading pluggy-1.7.0-py3-none-any.whl.metadata (5.0 kB)
+#9 10.64 Collecting pygments>=2.7.2 (from pytest==9.1.1->-r requirements.txt (line 7))
+#9 10.77   Downloading pygments-2.21.0-py3-none-any.whl.metadata (2.5 kB)
+#9 10.93 Collecting tzdata (from python-dateutil>=2.8.2->pandas==3.0.2->-r requirements.txt (line 2))
+#9 11.06   Downloading tzdata-2026.6-py2.py3-none-any.whl.metadata (1.4 kB)
+#9 11.20 Downloading numpy-2.5.4-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (16.7 MB)
+#9 17.44    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 16.7/16.7 MB 2.7 MB/s  0:00:06
+#9 17.59 Downloading pandas-3.0.2-cp313-cp313-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl (10.9 MB)
+#9 24.31    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 10.9/10.9 MB 1.6 MB/s  0:00:06
+#9 24.43 Downloading scipy-1.18.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (35.3 MB)
+#9 67.25    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 35.3/35.3 MB 743.5 kB/s  0:00:42
+#9 67.37 Downloading scikit_learn-1.9.1-cp313-cp313-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl (9.1 MB)
+#9 77.51    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 9.1/9.1 MB 909.6 kB/s  0:00:10
+#9 77.64 Downloading joblib-1.6.0-py3-none-any.whl (306 kB)
+#9 77.99 Downloading threadpoolctl-3.7.0-py3-none-any.whl (26 kB)
+#9 78.12 Downloading pytest-9.1.1-py3-none-any.whl (386 kB)
+#9 78.53 Downloading pluggy-1.7.0-py3-none-any.whl (27 kB)
+#9 78.66 Downloading cloudpickle-3.1.3-py3-none-any.whl (22 kB)
+#9 78.79 Downloading iniconfig-2.3.1-py3-none-any.whl (7.6 kB)
+#9 78.93 Downloading narwhals-2.29.0-py3-none-any.whl (501 kB)
+#9 79.38 Downloading packaging-26.3-py3-none-any.whl (129 kB)
+#9 79.58 Downloading pygments-2.21.0-py3-none-any.whl (1.3 MB)
+#9 80.49    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.3/1.3 MB 1.4 MB/s  0:00:00
+#9 80.64 Downloading python_dateutil-4.0.0-py3-none-any.whl (92 kB)
+#9 80.85 Downloading tzdata-2026.6-py2.py3-none-any.whl (348 kB)
+#9 81.82 Installing collected packages: tzdata, threadpoolctl, pygments, pluggy, packaging, numpy, narwhals, iniconfig, cloudpickle, scipy, python-dateutil, pytest, joblib, scikit-learn, pandas
+#9 105.7 
+#9 105.7 Successfully installed cloudpickle-3.1.3 iniconfig-2.3.1 joblib-1.6.0 narwhals-2.29.0 numpy-2.5.4 packaging-26.3 pandas-3.0.2 pluggy-1.7.0 pygments-2.21.0 pytest-9.1.1 python-dateutil-4.0.0 scikit-learn-1.9.1 scipy-1.18.1 threadpoolctl-3.7.0 tzdata-2026.6
+#9 105.7 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager, possibly rendering your system unusable. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv. Use the --root-user-action option if you know what you are doing and want to suppress this warning.
+#9 105.7 
+#9 105.7 [notice] A new release of pip is available: 26.2.2 -> 26.3
+#9 105.7 [notice] To update, run: pip install --upgrade pip
+#9 DONE 108.3s
+
+#10 [ 5/10] COPY src/ ./src/
+#10 DONE 0.4s
+
+#11 [ 6/10] COPY tests/ ./tests/
+#11 DONE 0.1s
+
+#12 [ 7/10] COPY data/ ./data/
+#12 DONE 0.1s
+
+#13 [ 8/10] COPY train.py predict.py ./
+#13 DONE 0.1s
+
+#14 [ 9/10] COPY pytest.ini ./
+#14 DONE 0.1s
+
+#15 [10/10] RUN mkdir -p models outputs
+#15 DONE 0.3s
+
+#16 exporting to image
+#16 exporting layers
+#16 exporting layers 22.8s done
+#16 exporting manifest sha256:b7cb2a0edd55d16eb94e3c68991bcf1cfa2a3ee18e9b3462b8f323fa9ed5e41f 0.0s done
+#16 exporting config sha256:11f125a25200b87b8c3a2d786467f8014b943082c8d1dc14782e902546807da5 0.0s done
+#16 exporting attestation manifest sha256:ea12ead8a383c312f87890a08c1b3c3d5900394c6a67c0481f11e508af5a2deb 0.0s done
+#16 exporting manifest list sha256:79ea36164d789ea24aa0f767e103ce04b5fd7cf150ec1be4fc66f6dc764d9098
+#16 exporting manifest list sha256:79ea36164d789ea24aa0f767e103ce04b5fd7cf150ec1be4fc66f6dc764d9098 0.0s done
+#16 naming to docker.io/library/modelos-fase2:1.0 done
+#16 unpacking to docker.io/library/modelos-fase2:1.0
+#16 unpacking to docker.io/library/modelos-fase2:1.0 9.0s done
+#16 DONE 31.9s
+Versión 'v-verificacion-docker' entrenada con 5634 clientes y evaluada con 1409 (umbral = 0.5).
+                  accuracy    recall        f1   roc_auc     costo
+Baseline            0.7346    0.0000    0.0000    0.5000    1870.0
+Modelo              0.7381    0.7834    0.6136    0.8415     693.0
+Abandonos detectados: 293 de 374 | no detectados: 81 | falsas alarmas: 288
+Archivos generados:
+  models/v-verificacion-docker/modelo.joblib
+  models/v-verificacion-docker/metrics.json
+  models/v-verificacion-docker/metadata.json
+commit en metadata.json (Docker): 6ab0002cc91fbac38117730a729e88fcadcde428
+OK: coincide con HEAD
+
+Recorrido completado. Evidencia en: /c/Users/norbe/telco-customer-churn-ml/fase-2/.verificacion
+```
 
 ### 9.2 Trazabilidad del commit en Docker
 El `Dockerfile` recibe el commit con `--build-arg` y lo expone como `GIT_COMMIT`; el entrenamiento lo copia a `metadata.json`:
