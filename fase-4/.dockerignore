@@ -1,0 +1,26 @@
+.git
+.gitignore
+.venv
+venv
+env
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.ipynb_checkpoints
+.vscode
+.idea
+.env
+kaggle.json
+*.pem
+*.key
+credentials*
+.coverage
+htmlcov
+# Los modelos y las salidas se montan como volúmenes
+models/*
+outputs/*
+logs/*
+Dockerfile
+.dockerignore
+README.md
