@@ -1,0 +1,5 @@
+# Saltos de línea fijos: el SHA-256 de los datos (metadata.json) y los scripts de shell
+# no deben cambiar según el sistema operativo (Windows convertiría LF en CRLF).
+*.csv text eol=lf
+*.sh text eol=lf
+*.joblib binary
