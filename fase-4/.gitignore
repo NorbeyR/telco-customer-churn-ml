@@ -1,0 +1,24 @@
+# Entornos y cachés
+.venv/
+venv/
+env/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+.vscode/
+.idea/
+.env
+kaggle.json
+
+# Artefactos temporales (v1, v2 y la versión creada con /train SÍ se versionan en Git)
+models/.*tmp*/
+models/v-docker/
+models/v-test*/
+outputs/*
+!outputs/.gitkeep
+
+# Registro de solicitudes (Fase 4): se conserva solo la muestra
+logs/*
+!logs/.gitkeep
+!logs/muestra_registro.csv
