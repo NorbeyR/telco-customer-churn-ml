@@ -1,0 +1,4 @@
+fecha_hora,estado_http,version,prediccion
+2026-11-22T23:58:11,200,v1,Churn
+2026-11-22T23:58:11,200,v1,No Churn
+2026-11-22T23:58:11,422,,

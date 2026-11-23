@@ -1,0 +1,70 @@
+{
+  "version": "v1",
+  "fecha_creacion_utc": "2026-10-29T23:29:05+00:00",
+  "tipo_problema": "clasificación binaria",
+  "variable_objetivo": "Churn",
+  "algoritmo": "LogisticRegression(class_weight='balanced') dentro de Pipeline (InputCleaner -> ColumnTransformer -> clasificador)",
+  "variables_entrada": {
+    "numericas": [
+      "tenure",
+      "MonthlyCharges",
+      "TotalCharges"
+    ],
+    "categoricas": [
+      "gender",
+      "SeniorCitizen",
+      "Partner",
+      "Dependents",
+      "PhoneService",
+      "MultipleLines",
+      "InternetService",
+      "OnlineSecurity",
+      "OnlineBackup",
+      "DeviceProtection",
+      "TechSupport",
+      "StreamingTV",
+      "StreamingMovies",
+      "Contract",
+      "PaperlessBilling",
+      "PaymentMethod"
+    ],
+    "tipos_esperados": {
+      "tenure": "numérico >= 0",
+      "MonthlyCharges": "numérico >= 0",
+      "TotalCharges": "numérico >= 0; vacío/espacios/nulo -> imputado con 0",
+      "SeniorCitizen": "0/1 o No/Yes",
+      "otras_categoricas": "texto; categorías no vistas se codifican en ceros"
+    }
+  },
+  "parametros_modelo": {
+    "C": 1.0,
+    "max_iter": 1000,
+    "class_weight": "balanced",
+    "penalizacion": "l2",
+    "umbral_decision": 0.5
+  },
+  "semilla": 42,
+  "datos": {
+    "fuente": "IBM Telco Customer Churn (Kaggle: blastchar/telco-customer-churn); muestra de una empresa ficticia",
+    "archivo": "WA_Fn-UseC_-Telco-Customer-Churn.csv",
+    "sha256": "88be4b93fbe0cc83421af1c503794c97c342eca914c1576db7c276e61d61358a",
+    "n_observaciones": 7043,
+    "proporcion_churn": 0.2654
+  },
+  "particion": {
+    "estrategia": "estratificada por objetivo (train_test_split)",
+    "test_size": 0.2,
+    "n_entrenamiento": 5634,
+    "n_prueba": 1409,
+    "metrica_evaluacion": "f1_churn, recall_churn, roc_auc, accuracy"
+  },
+  "entorno": {
+    "python": "3.12.10",
+    "scikit-learn": "1.9.1",
+    "dependencias": "requirements.txt"
+  },
+  "codigo": {
+    "commit": "0efe1bca72e410102e98ec25d0af5ebae22ff45d",
+    "cambios_sin_commit": false
+  }
+}

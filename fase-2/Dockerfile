@@ -22,5 +22,13 @@ COPY pytest.ini ./
 # Crear carpetas para la persistencia con volúmenes montados
 RUN mkdir -p models outputs
 
+# Trazabilidad: commit del código que construyó la imagen. Se recibe con
+#   docker build --build-arg GIT_COMMIT=$(git rev-parse HEAD) .
+# y src/versioning.py lo lee de esta variable de entorno para escribirlo en
+# metadata.json (dentro del contenedor no existe la carpeta .git).
+# Va al final para no invalidar la caché de las capas anteriores.
+ARG GIT_COMMIT=no-disponible
+ENV GIT_COMMIT=${GIT_COMMIT}
+
 # Comando predeterminado al iniciar el contenedor
 CMD ["python", "train.py", "--help"]

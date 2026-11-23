@@ -15,3 +15,4 @@ outputs/*
 Dockerfile
 .dockerignore
 README.md
+.verificacion
